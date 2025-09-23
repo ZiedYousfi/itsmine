@@ -1,28 +1,75 @@
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
+#include <string>
 
-class hey {
- private:
-  std::string name;
-  int age;
-  int* p_height;
+enum BytesType { Byte, KiloByte, MegaByte, GigaByte, TeraByte };
 
+class Params {
  public:
-  hey(std::string n, int a, int* h) : name(n), age(a), p_height(h) {};
-  ~hey() { delete p_height; };
+  Params(std::string argsCollected) {
+    BytesType bt = Byte;
 
-  void printInfo() {
-    std::cout << "Name: " << name << ", Age: " << age
-              << ", Height: " << *p_height << std::endl;
-  }
-
-  void setName(std::string n) { name = n; }
-  void setAge(int a) { age = a; }
-  void setHeight(int* h) {
-    if (p_height) {
-      delete p_height;
+    if (!argsCollected.empty()) {
+      char lastChar = argsCollected.at((std::size_t)(argsCollected.size() - 1));
+      switch (lastChar) {
+        case 'K':
+          bt = KiloByte;
+          break;
+        case 'M':
+          bt = MegaByte;
+          break;
+        case 'G':
+          bt = GigaByte;
+          break;
+        case 'T':
+          bt = TeraByte;
+          break;
+        default:
+          bt = Byte;
+          break;
+      }
     }
-    p_height = h;
+
+    // Extract numeric part (remove unit suffix if present)
+    std::string numberStr = argsCollected;
+    if (bt != Byte && !numberStr.empty()) {
+      numberStr.pop_back();
+    }
+
+    std::size_t charactersAfterNumber{0};
+    std::uint64_t demandedSize = 0;
+    if (!numberStr.empty()) {
+      demandedSize = std::stoull(numberStr, &charactersAfterNumber, 10);
+    }
+
+    std::uint64_t multiplier = 1;
+    switch (bt) {
+      case KiloByte:
+        multiplier = 1024ULL;
+        break;
+      case MegaByte:
+        multiplier = 1024ULL * 1024ULL;
+        break;
+      case GigaByte:
+        multiplier = 1024ULL * 1024ULL * 1024ULL;
+        break;
+      case TeraByte:
+        multiplier = 1024ULL * 1024ULL * 1024ULL * 1024ULL;
+        break;
+      default:
+        multiplier = 1ULL;
+        break;
+    }
+
+    size_ = static_cast<std::size_t>(demandedSize * multiplier);
   }
+  ~Params() {}
+
+  std::size_t getSize() const { return size_; }
+
+ private:
+  std::size_t size_;
 };
 
 int main(int argc, char** argv) {
@@ -30,10 +77,6 @@ int main(int argc, char** argv) {
 
   (void)argc;
   (void)argv;
-
-  hey* h = new hey("Alice", 30, new int(170));
-  h->printInfo();
-  delete h;
 
   return 0;
 }
