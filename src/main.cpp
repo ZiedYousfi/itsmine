@@ -31,5 +31,6 @@ int main(int argc, char** argv) {
   hey* h = new hey("Alice", 30, new int(170));
   h->printInfo();
   delete h;
+
   return 0;
 }
