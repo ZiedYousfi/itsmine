@@ -28,6 +28,9 @@ class hey {
 int main(int argc, char** argv) {
   std::cout << "Hello, from itsmine!\n";
 
+  (void)argc;
+  (void)argv;
+
   hey* h = new hey("Alice", 30, new int(170));
   h->printInfo();
   delete h;
