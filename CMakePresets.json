@@ -16,6 +16,26 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
+    },
+    {
+      "name": "msvc-debug",
+      "generator": "Ninja",
+      "binaryDir": "build/msvc-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_C_COMPILER": "cl.exe"
+      }
+    },
+    {
+      "name": "msvc-release",
+      "generator": "Ninja",
+      "binaryDir": "build/msvc-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_C_COMPILER": "cl.exe"
+      }
     }
   ],
   "buildPresets": [
