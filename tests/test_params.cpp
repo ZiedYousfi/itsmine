@@ -12,7 +12,7 @@ int main() {
                                       std::size_t expected_size) {
     ++tests_run;
     try {
-      Params p(s);
+      AllocationParams::Params p(s);
       if (p.getSize() == expected_size) {
         ++tests_passed;
         return;
@@ -30,7 +30,7 @@ int main() {
   auto expect_no_throw_and_zero = [&](const std::string& s) {
     ++tests_run;
     try {
-      Params p(s);
+      AllocationParams::Params p(s);
       if (p.getSize() == 0) {
         ++tests_passed;
         return;
@@ -48,7 +48,7 @@ int main() {
   auto expect_throw = [&](const std::string& s) {
     ++tests_run;
     try {
-      Params p(s);
+      AllocationParams::Params p(s);
       std::cerr << "Test failed: expected exception for '" << s
                 << "' but none thrown\n";
       std::exit(1);
