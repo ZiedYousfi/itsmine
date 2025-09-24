@@ -1,6 +1,6 @@
 #include "params.hpp"
 
-Params::Params(std::string argsCollected) {
+AllocationParams::Params::Params(std::string argsCollected) {
   {
     if (argsCollected.empty()) {
       size_ = 0;
@@ -92,10 +92,10 @@ Params::Params(std::string argsCollected) {
   }
 }
 
-std::size_t Params::getSize() const { return size_; }
-BytesType Params::getBytesType() const { return bytesType_; }
+std::size_t AllocationParams::Params::getSize() const { return size_; }
+AllocationParams::BytesType AllocationParams::Params::getBytesType() const { return bytesType_; }
 
-std::string Params::getBytesTypeString() const {
+std::string AllocationParams::Params::getBytesTypeString() const {
   switch (bytesType_) {
     case Byte:
       return "B";

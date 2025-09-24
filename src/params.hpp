@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <string>
 
+namespace AllocationParams {
+
 enum BytesType { Byte, KiloByte, MegaByte, GigaByte, TeraByte };
 
 class Params {
@@ -19,3 +21,5 @@ class Params {
   std::size_t size_{};
   BytesType bytesType_{Byte};
 };
+
+}  // namespace AllocationParams
