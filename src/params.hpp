@@ -8,7 +8,7 @@ enum BytesType { Byte, KiloByte, MegaByte, GigaByte, TeraByte };
 
 class Params {
  public:
-  explicit Params(std::string argsCollected);
+  Params(std::string argsCollected);
   ~Params() = default;
 
   std::size_t getSize() const;

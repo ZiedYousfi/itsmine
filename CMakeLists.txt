@@ -17,6 +17,12 @@ else()
   target_compile_options(itsmine PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
+# Add library for Params implementation and link it to executables
+add_library(params_impl STATIC src/params.cpp)
+target_include_directories(params_impl PUBLIC ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(itsmine PRIVATE params_impl)
+target_link_libraries(test_params PRIVATE params_impl)
+
 include(CTest)
 enable_testing()
 

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-#include "../src/params.h"
+#include "../src/params.hpp"
 
 static int tests_run = 0;
 
