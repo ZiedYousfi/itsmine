@@ -1,14 +1,7 @@
-#pragma once
+#include "params.hpp"
 
-#include <cstddef>
-#include <cstdint>
-#include <string>
-
-enum BytesType { Byte, KiloByte, MegaByte, GigaByte, TeraByte };
-
-class Params {
- public:
-  explicit Params(std::string argsCollected) {
+Params::Params(std::string argsCollected) {
+  {
     BytesType bt = Byte;
 
     if (!argsCollected.empty()) {
@@ -64,10 +57,6 @@ class Params {
 
     size_ = static_cast<std::size_t>(demandedSize * multiplier);
   }
-  ~Params() = default;
+}
 
-  std::size_t getSize() const { return size_; }
-
- private:
-  std::size_t size_{};
-};
+std::size_t Params::getSize() const { return size_; }
