@@ -11,10 +11,17 @@ int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
+  std::string sizeToAllocate = "1MB";
+
+  if (argc > 1) {
+    sizeToAllocate = argv[1];
+  }
+
+
   AllocationParams::Params* params = nullptr;
 
   try {
-    params = new AllocationParams::Params("1MB");
+    params = new AllocationParams::Params(sizeToAllocate);
     std::cout << "Params object created successfully.\n";
     std::cout << "Parsed size: " << params->getSize() << " "
               << params->getBytesTypeString() << "\n";
