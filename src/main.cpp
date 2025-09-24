@@ -8,15 +8,11 @@
 int main(int argc, char** argv) {
   std::cout << "Hello, from itsmine!\n";
 
-  (void)argc;
-  (void)argv;
-
   std::string sizeToAllocate = "1MB";
 
   if (argc > 1) {
     sizeToAllocate = argv[1];
   }
-
 
   AllocationParams::Params* params = nullptr;
 
