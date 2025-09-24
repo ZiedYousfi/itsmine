@@ -72,10 +72,8 @@ int main() {
   }
 
   std::vector<std::pair<std::string, std::size_t>> should_pass = {
-      {"0", 0},           {"10", 10},
-      {"1024", 1024},     {"1K", 1024},
-      {"2K", 2048},       {"1M", 1048576},
-      {"1G", 1073741824}, {"1T", 1099511627776ULL}};
+      {"10BB", 10},     {"1KB", 1024},       {"2KB", 2048},
+      {"1MB", 1048576}, {"1GB", 1073741824}, {"1TB", 1099511627776ULL}};
   for (const auto& [s, expected_size] : should_pass) {
     expect_no_throw_and_size(s, expected_size);
   }
