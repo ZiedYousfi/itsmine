@@ -2,6 +2,28 @@
 
 Params::Params(std::string argsCollected) {
   {
+    if (argsCollected.empty()) {
+      size_ = 0;
+      bytesType_ = Byte;
+      return;
+    }
+    
+    char lastCharLocal = argsCollected.back();
+    char secondLastChar = '\0';
+    bool hasSecondLast = argsCollected.size() >= 2;
+    if (hasSecondLast) {
+      secondLastChar = argsCollected[argsCollected.size() - 2];
+    }
+
+    bool lastIsDigit = (lastCharLocal >= '0' && lastCharLocal <= '9');
+    bool secondLastIsDigit =
+        hasSecondLast && (secondLastChar >= '0' && secondLastChar <= '9');
+
+    if (lastIsDigit || secondLastIsDigit) {
+      throw std::invalid_argument("Invalid size format: no unit specified");
+      return;
+    }
+
     BytesType bt = Byte;
 
     if (!argsCollected.empty()) {
