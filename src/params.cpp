@@ -7,7 +7,7 @@ Params::Params(std::string argsCollected) {
       bytesType_ = Byte;
       return;
     }
-    
+
     char lastCharLocal = argsCollected.back();
     char secondLastChar = '\0';
     bool hasSecondLast = argsCollected.size() >= 2;
@@ -27,8 +27,14 @@ Params::Params(std::string argsCollected) {
     BytesType bt = Byte;
 
     if (!argsCollected.empty()) {
-      char lastChar = argsCollected.at((std::size_t)(argsCollected.size() - 2));
-      switch (lastChar) {
+      // Look at the second-last character (commonly the unit letter
+      // when a trailing 'B' is present). Use uppercase for case-insenstive
+      // matching.
+      char secondLast = argsCollected.size() >= 2
+                            ? static_cast<char>(std::toupper(
+                                  argsCollected[argsCollected.size() - 2]))
+                            : '\0';
+      switch (secondLast) {
         case 'K':
           bt = KiloByte;
           break;
@@ -48,8 +54,12 @@ Params::Params(std::string argsCollected) {
     }
 
     std::string numberStr = argsCollected;
-    if (bt != Byte && !numberStr.empty()) {
-      numberStr.pop_back();
+    // If we detected a unit (e.g. 'M' + 'B'), strip the final two characters
+    // so the numeric portion is the pure digits only. For other inputs
+    // (like "10BB") leave the string intact and rely on stoull to parse
+    // the initial numeric part.
+    if (bt != Byte && numberStr.size() >= 2) {
+      numberStr = numberStr.substr(0, numberStr.size() - 2);
     }
 
     std::size_t charactersAfterNumber{0};
@@ -84,3 +94,20 @@ Params::Params(std::string argsCollected) {
 
 std::size_t Params::getSize() const { return size_; }
 BytesType Params::getBytesType() const { return bytesType_; }
+
+std::string Params::getBytesTypeString() const {
+  switch (bytesType_) {
+    case Byte:
+      return "B";
+    case KiloByte:
+      return "KB";
+    case MegaByte:
+      return "MB";
+    case GigaByte:
+      return "GB";
+    case TeraByte:
+      return "TB";
+    default:
+      return "B";
+  }
+}

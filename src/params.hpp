@@ -13,6 +13,7 @@ class Params {
 
   std::size_t getSize() const;
   BytesType getBytesType() const;
+  std::string getBytesTypeString() const;
 
  private:
   std::size_t size_{};
