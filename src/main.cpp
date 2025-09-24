@@ -11,8 +11,8 @@ int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  Params params("1024KB");
-  std::cout << "Parsed size: " << params.getSize() << " bytes\n";
+  Params params("1024MB");
+  std::cout << "Parsed size: " << params.getSize() << " " << params.getBytesType() << "\n";
 
   return 0;
 }

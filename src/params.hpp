@@ -12,7 +12,9 @@ class Params {
   ~Params() = default;
 
   std::size_t getSize() const;
+  BytesType getBytesType() const;
 
  private:
   std::size_t size_{};
+  BytesType bytesType_{Byte};
 };

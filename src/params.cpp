@@ -5,7 +5,7 @@ Params::Params(std::string argsCollected) {
     BytesType bt = Byte;
 
     if (!argsCollected.empty()) {
-      char lastChar = argsCollected.at((std::size_t)(argsCollected.size() - 1));
+      char lastChar = argsCollected.at((std::size_t)(argsCollected.size() - 2));
       switch (lastChar) {
         case 'K':
           bt = KiloByte;
@@ -56,7 +56,9 @@ Params::Params(std::string argsCollected) {
     }
 
     size_ = static_cast<std::size_t>(demandedSize * multiplier);
+    bytesType_ = bt;
   }
 }
 
 std::size_t Params::getSize() const { return size_; }
+BytesType Params::getBytesType() const { return bytesType_; }
