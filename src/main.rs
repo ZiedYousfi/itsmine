@@ -79,6 +79,7 @@ impl Memory {
             println!("Using allocated memory...");
             for i in 0..total_size as usize {
                 *ptr.add(i) = 0;
+                print!("used byte {}\r", i);
             }
             println!("Memory allocation and usage complete.");
 
