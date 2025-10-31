@@ -49,7 +49,14 @@ impl Memory {
             ));
         };
 
-        let size = size_str.strip_suffix(suffix).unwrap().parse::<u32>()?;
+        let size = size_str
+            .strip_suffix(suffix)
+            .ok_or_else(|| anyhow::anyhow!("Invalid memory size {size_str}"))
+            .and_then(|s| {
+                s.parse::<u32>()
+                    .map_err(|e| anyhow::anyhow!("Failed to parse memory size '{s}': {e}"))
+            })
+            .expect("Failed to parse memory size");
 
         // drop(res);
 
@@ -97,5 +104,105 @@ fn main() {
         Resource::Thread { .. } => {
             todo!("Implement thread resource allocation");
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_memory_allocation() {
+        let memory = Memory {
+            size: 1,
+            multiplier: 1024,
+        };
+        memory.execute();
+    }
+
+    #[test]
+    fn memory_from_resource_valid_b() {
+        let res = Resource::Memory {
+            arg: "100B".to_string(),
+        };
+        let memory = Memory::from_resource(res).unwrap();
+        assert_eq!(memory.size, 100);
+        assert_eq!(memory.multiplier, 1);
+    }
+
+    #[test]
+    fn memory_from_resource_valid_g() {
+        let res = Resource::Memory {
+            arg: "2G".to_string(),
+        };
+        let memory = Memory::from_resource(res).unwrap();
+        assert_eq!(memory.size, 2);
+        assert_eq!(memory.multiplier, 1024 * 1024 * 1024);
+    }
+
+    #[test]
+    fn memory_from_resource_invalid_no_suffix() {
+        let res = Resource::Memory {
+            arg: "10".to_string(),
+        };
+        let result = Memory::from_resource(res);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn memory_from_resource_invalid_wrong_suffix() {
+        let res = Resource::Memory {
+            arg: "10X".to_string(),
+        };
+        let result = Memory::from_resource(res);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "Failed to parse memory size: Failed to parse memory size 'abc': invalid digit found in string"
+    )]
+    fn memory_from_resource_invalid_non_numeric() {
+        let res = Resource::Memory {
+            arg: "abcK".to_string(),
+        };
+        let result = Memory::from_resource(res);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn memory_from_resource_zero_size() {
+        let res = Resource::Memory {
+            arg: "0K".to_string(),
+        };
+        let memory = Memory::from_resource(res).unwrap();
+        assert_eq!(memory.size, 0);
+        assert_eq!(memory.multiplier, 1024);
+    }
+
+    #[test]
+    #[should_panic(expected = "Memory size must be greater than 0")]
+    fn test_memory_execute_zero_size() {
+        let memory = Memory {
+            size: 0,
+            multiplier: 1,
+        };
+        memory.execute();
+    }
+
+    #[test]
+    fn test_memory_execute_large() {
+        let memory = Memory {
+            size: 1,
+            multiplier: 1024 * 1024, // 1M
+        };
+        memory.execute();
+    }
+
+    #[test]
+    fn memory_from_resource_invalid() {
+        let res = Resource::Thread { num: 4 };
+        let result = Memory::from_resource(res);
+        assert!(result.is_err());
     }
 }
