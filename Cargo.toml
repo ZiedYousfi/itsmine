@@ -7,3 +7,12 @@ edition = "2024"
 anyhow = "1.0.100"
 thiserror = "2.0.17"
 clap = { version = "4.5.51", features = ["derive"] }
+log = "0.4.20"
+
+[profile.dev]
+opt-level = 0
+lto = false
+
+[profile.release]
+opt-level = 0
+lto = false
