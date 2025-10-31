@@ -58,6 +58,7 @@ impl Memory {
 
     fn execute(self) {
         let total_size = self.size * self.multiplier;
+        assert!(total_size > 0, "Memory size must be greater than 0");
         println!("Allocating {} bytes of memory.", total_size);
 
         unsafe {
