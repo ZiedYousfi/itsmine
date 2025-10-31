@@ -15,8 +15,8 @@ enum Resource {
 
 #[derive(Clone)]
 struct Memory {
-    size: u32,
-    multiplier: u32,
+    size: u64,
+    multiplier: u64,
 }
 
 impl Memory {
@@ -53,7 +53,7 @@ impl Memory {
             .strip_suffix(suffix)
             .ok_or_else(|| anyhow::anyhow!("Invalid memory size {size_str}"))
             .and_then(|s| {
-                s.parse::<u32>()
+                s.parse::<u64>()
                     .map_err(|e| anyhow::anyhow!("Failed to parse memory size '{s}': {e}"))
             })
             .expect("Failed to parse memory size");
