@@ -76,9 +76,11 @@ impl Memory {
             }
 
             // dummy usage of allocated memory
+            println!("Using allocated memory...");
             for i in 0..total_size as usize {
                 *ptr.add(i) = 0;
             }
+            println!("Memory allocation and usage complete.");
 
             std::alloc::dealloc(ptr, layout);
         }
