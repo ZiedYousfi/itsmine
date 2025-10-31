@@ -13,6 +13,7 @@ enum Resource {
     Thread { num: u32 },
 }
 
+#[derive(Clone)]
 struct Memory {
     size: u32,
     multiplier: u32,
@@ -55,7 +56,7 @@ impl Memory {
         Ok(Memory { size, multiplier })
     }
 
-    fn execute(&self) {
+    fn execute(self) {
         let total_size = self.size * self.multiplier;
         println!("Allocating {} bytes of memory.", total_size);
 
