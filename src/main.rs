@@ -19,6 +19,8 @@ struct Memory {
     multiplier: u64,
 }
 
+struct Thread(u32);
+
 impl Memory {
     fn from_resource(res: Resource) -> Result<Self, anyhow::Error> {
         match res {
@@ -88,6 +90,64 @@ impl Memory {
     }
 }
 
+impl Thread {
+    fn new(num: u32) -> Self {
+        Thread(num)
+    }
+
+    fn from_resource(res: Resource) -> Result<Self, anyhow::Error> {
+        match res {
+            Resource::Thread { num } => Ok(Thread::new(num)),
+            Resource::Memory { .. } => Err(anyhow::anyhow!(
+                "Expected Thread resource, got Memory resource"
+            )),
+        }
+    }
+
+    fn execute(self) {
+        println!("Spawning {} threads.", self.0);
+        let mut handles = vec![];
+
+        let (tx, rx) = std::sync::mpsc::channel::<u32>();
+
+        for i in 0..self.0 {
+            let tx = tx.clone();
+            let handle = std::thread::spawn(move || {
+                println!("Thread {} started.", i);
+                let fib = fibonacci(30); // Example workload
+                tx.send(fib).unwrap();
+                println!("Thread {} finished. Fibonacci(30) = {}", i, fib);
+            });
+            handles.push(handle);
+        }
+
+        let mut results: Vec<u32> = vec![];
+
+        for handle in handles {
+            handle.join().expect("Thread panicked");
+            let result = rx.recv().unwrap();
+            results.push(result);
+            println!("Received from thread: {}", result);
+        }
+
+        let first = results[0];
+
+        for &x in results.iter() {
+            if x != first {
+                panic!("Inconsistent results from threads");
+            }
+        }
+        println!("All threads completed.");
+    }
+}
+
+fn fibonacci(n: u32) -> u32 {
+    if n <= 1 {
+        return n;
+    }
+    fibonacci(n - 1) + fibonacci(n - 2)
+}
+
 fn main() {
     let cli = Cli::parse();
     println!("Hello, world!");
@@ -105,7 +165,12 @@ fn main() {
         }
 
         Resource::Thread { .. } => {
-            todo!("Implement thread resource allocation");
+            Thread::from_resource(cli.resource)
+                .unwrap_or_else(|e| {
+                    eprintln!("Error: {e}");
+                    std::process::exit(1);
+                })
+                .execute();
         }
     }
 }
@@ -114,6 +179,7 @@ fn main() {
 mod tests {
     use super::*;
 
+    // Memory tests
     #[test]
     fn test_memory_allocation() {
         let memory = Memory {
@@ -206,6 +272,23 @@ mod tests {
     fn memory_from_resource_invalid() {
         let res = Resource::Thread { num: 4 };
         let result = Memory::from_resource(res);
+        assert!(result.is_err());
+    }
+
+    // Thread tests
+    #[test]
+    fn thread_from_resource_valid() {
+        let res = Resource::Thread { num: 4 };
+        let thread = Thread::from_resource(res).unwrap();
+        assert_eq!(thread.0, 4);
+    }
+
+    #[test]
+    fn thread_from_resource_invalid() {
+        let res = Resource::Memory {
+            arg: "100K".to_string(),
+        };
+        let result = Thread::from_resource(res);
         assert!(result.is_err());
     }
 }
