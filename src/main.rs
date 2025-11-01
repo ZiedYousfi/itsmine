@@ -152,11 +152,11 @@ fn fibonacci(n: u32) -> u32 {
 
 fn main() {
     let cli = Cli::parse();
-    log::info!("Hello, world!");
     match cli.verbose {
-        true => log::set_max_level(log::LevelFilter::Debug),
-        false => log::set_max_level(log::LevelFilter::Info),
+        true => simple_logger::init_with_level(log::Level::Debug).unwrap(),
+        false => simple_logger::init_with_level(log::Level::Error).unwrap(),
     }
+    log::info!("Hello, world!");
 
     match cli.resource {
         Resource::Memory { .. } => {
