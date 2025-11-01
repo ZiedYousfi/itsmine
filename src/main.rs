@@ -83,7 +83,9 @@ impl Memory {
             log::info!("Using allocated memory...");
             for i in 0..total_size as usize {
                 *ptr.add(i) = 0;
-                log::info!("used byte {}", i);
+                if log::log_enabled!(log::Level::Info) {
+                    print!("used byte {i}\r");
+                }
             }
             log::info!("Memory allocation and usage complete.");
 
