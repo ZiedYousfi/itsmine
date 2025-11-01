@@ -5,6 +5,8 @@ use clap::{Parser, Subcommand};
 struct Cli {
     #[command(subcommand)]
     resource: Resource,
+    #[arg(short, long, default_value_t = false)]
+    verbose: bool,
 }
 
 #[derive(Clone, Subcommand)]
@@ -68,7 +70,7 @@ impl Memory {
     fn execute(self) {
         let total_size = self.size * self.multiplier;
         assert!(total_size > 0, "Memory size must be greater than 0");
-        println!("Allocating {} bytes of memory.", total_size);
+        log::info!("Allocating {} bytes of memory.", total_size);
 
         unsafe {
             let layout = std::alloc::Layout::from_size_align(total_size as usize, 8).unwrap();
@@ -78,12 +80,12 @@ impl Memory {
             }
 
             // dummy usage of allocated memory
-            println!("Using allocated memory...");
+            log::info!("Using allocated memory...");
             for i in 0..total_size as usize {
                 *ptr.add(i) = 0;
-                print!("used byte {}\r", i);
+                log::info!("used byte {}", i);
             }
-            println!("Memory allocation and usage complete.");
+            log::info!("Memory allocation and usage complete.");
 
             std::alloc::dealloc(ptr, layout);
         }
@@ -105,7 +107,7 @@ impl Thread {
     }
 
     fn execute(self) {
-        println!("Spawning {} threads.", self.0);
+        log::info!("Spawning {} threads.", self.0);
         let mut handles = vec![];
 
         let (tx, rx) = std::sync::mpsc::channel::<u32>();
@@ -113,10 +115,10 @@ impl Thread {
         for i in 0..self.0 {
             let tx = tx.clone();
             let handle = std::thread::spawn(move || {
-                println!("Thread {} started.", i);
+                log::info!("Thread {} started.", i);
                 let fib = fibonacci(30); // Example workload
                 tx.send(fib).unwrap();
-                println!("Thread {} finished. Fibonacci(30) = {}", i, fib);
+                log::info!("Thread {} finished. Fibonacci(30) = {}", i, fib);
             });
             handles.push(handle);
         }
@@ -127,7 +129,7 @@ impl Thread {
             handle.join().expect("Thread panicked");
             let result = rx.recv().unwrap();
             results.push(result);
-            println!("Received from thread: {}", result);
+            log::info!("Received from thread: {}", result);
         }
 
         let first = results[0];
@@ -137,7 +139,7 @@ impl Thread {
                 panic!("Inconsistent results from threads");
             }
         }
-        println!("All threads completed.");
+        log::info!("All threads completed.");
     }
 }
 
@@ -150,24 +152,28 @@ fn fibonacci(n: u32) -> u32 {
 
 fn main() {
     let cli = Cli::parse();
-    println!("Hello, world!");
+    log::info!("Hello, world!");
+    match cli.verbose {
+        true => log::set_max_level(log::LevelFilter::Debug),
+        false => log::set_max_level(log::LevelFilter::Info),
+    }
 
     match cli.resource {
         Resource::Memory { .. } => {
             Memory::from_resource(cli.resource)
                 .unwrap_or_else(|e| {
-                    eprintln!("Error: {e}");
+                    log::error!("Error: {e}");
                     std::process::exit(1);
                 })
                 .execute();
 
-            println!("Done!");
+            log::info!("Done!");
         }
 
         Resource::Thread { .. } => {
             Thread::from_resource(cli.resource)
                 .unwrap_or_else(|e| {
-                    eprintln!("Error: {e}");
+                    log::error!("Error: {e}");
                     std::process::exit(1);
                 })
                 .execute();
