@@ -80,10 +80,10 @@ impl Memory {
             }
 
             // dummy usage of allocated memory
-            log::info!("Using allocated memory...");
+            log::info!("Dummy usage of allocated memory...");
             for i in 0..total_size as usize {
                 *ptr.add(i) = 0;
-                if log::log_enabled!(log::Level::Info) {
+                if log::log_enabled!(log::Level::Debug) {
                     print!("used byte {i}\r");
                 }
             }
@@ -117,10 +117,10 @@ impl Thread {
         for i in 0..self.0 {
             let tx = tx.clone();
             let handle = std::thread::spawn(move || {
-                log::info!("Thread {} started.", i);
+                log::debug!("Thread {i} started.");
                 let fib = fibonacci(30); // Example workload
                 tx.send(fib).unwrap();
-                log::info!("Thread {} finished. Fibonacci(30) = {}", i, fib);
+                log::debug!("Thread {i} finished. Fibonacci(30) = {fib}");
             });
             handles.push(handle);
         }
@@ -131,7 +131,7 @@ impl Thread {
             handle.join().expect("Thread panicked");
             let result = rx.recv().unwrap();
             results.push(result);
-            log::info!("Received from thread: {}", result);
+            log::debug!("Received from thread: {}", result);
         }
 
         let first = results[0];
@@ -156,7 +156,7 @@ fn main() {
     let cli = Cli::parse();
     match cli.verbose {
         true => simple_logger::init_with_level(log::Level::Debug).unwrap(),
-        false => simple_logger::init_with_level(log::Level::Error).unwrap(),
+        false => simple_logger::init_with_level(log::Level::Info).unwrap(),
     }
     log::info!("Hello, world!");
 
@@ -179,6 +179,8 @@ fn main() {
                     std::process::exit(1);
                 })
                 .execute();
+
+            log::info!("Done!");
         }
     }
 }
